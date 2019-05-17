@@ -11,17 +11,16 @@ int maxRange = 0;
 int minECG = 0;
 int minRange = 0;
 int threshold = 0;
-int totalRange = 0;
-double x = 1;
-double y = 0;
+unsigned long countAvg = 1;
+unsigned long sumECG = 0;
 unsigned long runTime;
-bool stateCheck = false;
+bool mainAlgorithm = false;
 ///////////////////////////////////////////////BPM Variables
 unsigned long time1 =0; 
 unsigned long time2 = 0; 
 unsigned long period1, period2, period3, period4, periodAvg;
 unsigned long BPM = 0; 
-int state = 0; 
+char state = 0; 
 unsigned long switchCount = 1;
 
 
@@ -44,9 +43,9 @@ void loop() {
   while(runTime <= 10000) 
   {
     
-    y = y + rawECG;
-    avgECG = (int)(y/x);
-    x++;
+    sumECG = sumECG + rawECG;
+    avgECG = (int)(sumECG/countAvg);
+    countAvg++;
     
     maxECG = max(rawECG, maxECG);
     minECG = min(rawECG, minECG);
@@ -55,9 +54,8 @@ void loop() {
     
   }
 
-  if(stateCheck == false) 
+  if(mainAlgorithm == false) 
   {
-    //totalRange = maxECG - minECG;
     maxRange = maxECG - avgECG;
     minRange = avgECG - minECG;
 
@@ -67,17 +65,17 @@ void loop() {
     else if(maxRange < minRange) 
       threshold = int((avgECG + 3*minECG)/4.0);
    
-    stateCheck = true;
+    mainAlgorithm = true;
   }
 
-  if(stateCheck = true) 
+  if(mainAlgorithm = true) 
   {
     rawECG = analogRead(A0);
      
     if(rawECG < threshold) 
-      state = 1;
+      state = true;
 
-      else if (state == 1) 
+      else if (state == true) 
       { 
         if(rawECG >= threshold) 
         {
